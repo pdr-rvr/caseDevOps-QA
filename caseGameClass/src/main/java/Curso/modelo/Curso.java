@@ -1,4 +1,4 @@
-package Curso.modelo;
+package curso.modelo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +10,11 @@ public class Curso {
 
     // implementação para o teste 1 passar - Pedro
     public Curso(String nome) {
+    	
+    	if (nome == null || nome.trim().isEmpty())
+    	{
+    		throw new IllegalArgumentException("O nome do curso não pode ser nulo ou vazio.");
+    	}
         this.nome = nome;        
         this.aulas = new ArrayList<>();
     }
@@ -19,6 +24,10 @@ public class Curso {
     
  // implementação para o teste 2 passar - André
     public void adicionaAula(String aula) {
+    	if (aula == null || aula.trim().isEmpty())
+    	{
+    		throw new IllegalArgumentException("O nome da aula não pode ser nulo ou vazio.");
+    	}
         this.aulas.add(aula);
     }
 
