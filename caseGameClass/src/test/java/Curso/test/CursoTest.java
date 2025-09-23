@@ -1,13 +1,14 @@
-package Curso.test;
+package curso.test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName; // Opcional, mas bom para relatórios
 
-import Curso.modelo.Curso;
+import curso.modelo.Curso;
 
 @DisplayName("Testes da entidade Curso")
 public class CursoTest {
@@ -45,5 +46,44 @@ public class CursoTest {
 		// PONTO CRÍTICO: Usar assertArrayEquals para comparar o CONTEÚDO de arrays.
 		// assertEquals compararia apenas a referência de memória, o que sempre falharia.
 		assertArrayEquals(aulasEsperadas, aulasCadastradas, "A lista de aulas cadastradas nao corresponde a esperada.");
+	}
+	
+	@Test
+	@DisplayName("Não deve permitir criar curso com nome vazio")
+	public void naoDevePermitirCursoComNomeVazio() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+	        new Curso("");
+	    });
+	    assertEquals("O nome do curso não pode ser nulo ou vazio.", exception.getMessage());
+	}
+	
+	@Test
+	@DisplayName("Não deve permitir criar curso com nome nulo")
+	public void naoDevePermitirCursoComNomeNulo() {
+	    assertThrows(IllegalArgumentException.class, () -> {
+	        new Curso(null);
+	    });
+	}
+	
+	@Test
+	@DisplayName("Não deve permitir criar aula com nome vazio")
+	public void naoDevePermitirAulaComNomeVazio() {
+		Curso curso = new Curso("Introducao a Java");
+		
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+	        curso.adicionaAula("");
+	    });
+	    assertEquals("O nome da aula não pode ser nulo ou vazio.", exception.getMessage());
+	}
+	
+	@Test
+	@DisplayName("Não deve permitir criar aula com nome nulo")
+	public void naoDevePermitirAulaComNomeNulo() {
+		Curso curso = new Curso("Introducao a Java");
+		
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+	        curso.adicionaAula(null);
+	    });
+	    assertEquals("O nome da aula não pode ser nulo ou vazio.", exception.getMessage());
 	}
 }
