@@ -1,0 +1,29 @@
+pipeline {
+    // Indica que pode rodar em qualquer agente (máquina)
+    agent any
+
+    // Define as etapas do pipeline
+    stages {
+        // Etapa 1: Fazer o deploy em Staging (Homologação)
+        stage('Deploy to Staging') {
+            steps {
+                echo 'Iniciando deploy em Staging...'
+                
+                // 1. Tenta parar e remover qualquer contêiner antigo com o mesmo nome
+                // Usamos "exit 0" para garantir que o build não falhe se o contêiner não existir.
+                bat 'docker stop staging-app 2>nul & docker rm staging-app 2>nul & exit 0'
+                
+                // 2. Baixa a imagem mais recente que enviamos para o Docker Hub
+                bat 'docker pull rvrpdr/casedevops-qa:latest'
+                
+                // 3. Roda o novo contêiner
+                // -d = Roda em background (detached)
+                // --name staging-app = Dá um nome ao contêiner
+                // -p 8080:8080 = Mapeia a porta 8080 do seu PC para a porta 8080 do contêiner
+                bat 'docker run -d --name staging-app -p 8080:8080 rvrpdr/casedevops-qa:latest'
+                
+                echo 'Aplicação em Staging iniciada!'
+            }
+        }
+    }
+}
