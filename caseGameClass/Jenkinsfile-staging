@@ -1,26 +1,29 @@
 pipeline {
-    // Indica que pode rodar em qualquer agente (máquina)
     agent any
 
-    // Define as etapas do pipeline
     stages {
-        // Etapa 1: Fazer o deploy em Staging (Homologação)
         stage('Deploy to Staging') {
             steps {
                 echo 'Iniciando deploy em Staging...'
                 
-                // 1. Tenta parar e remover qualquer contêiner antigo com o mesmo nome
-                // Usamos "exit 0" para garantir que o build não falhe se o contêiner não existir.
+                // 1. Para e remove contêineres antigos
                 bat 'docker stop staging-app 2>nul & docker rm staging-app 2>nul & exit 0'
                 
-                // 2. Baixa a imagem mais recente que enviamos para o Docker Hub
+                // 2. Baixa a imagem mais recente
                 bat 'docker pull rvrpdr/casedevops-qa:latest'
                 
-                // 3. Roda o novo contêiner
-                // -d = Roda em background (detached)
-                // --name staging-app = Dá um nome ao contêiner
-                // -p 8080:8080 = Mapeia a porta 8080 do seu PC para a porta 8080 do contêiner
-                bat 'docker run -d --name staging-app -p 8080:8080 rvrpdr/casedevops-qa:latest'
+                // 3. Roda o novo contêiner com variáveis de ambiente para o banco H2
+                // (O ^ no Windows permite quebrar a linha)
+                bat '''
+                docker run -d --name staging-app -p 8080:8080 ^
+                -e SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb ^
+                -e SPRING_DATASOURCE_DRIVERCN=org.h2.Driver ^
+                -e SPRING_DATASOURCE_USERNAME=sa ^
+                -e SPRING_DATASOURCE_PASSWORD=password ^
+                -e SPRING_JPA_DATABASE-PLATFORM=org.hibernate.dialect.H2Dialect ^
+                -e SPRING_JPA_HIBERNATE_DDL_AUTO=update ^
+                rvrpdr/casedevops-qa:latest
+                '''
                 
                 echo 'Aplicação em Staging iniciada!'
             }
