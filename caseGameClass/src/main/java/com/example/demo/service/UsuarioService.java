@@ -1,15 +1,15 @@
-package service;
+package com.example.demo.service;
 
-import dto.UsuarioRequestDTO;
-import dto.UsuarioResponseDTO;
-import entity.Email;
-import entity.Matricula;
-import entity.Senha;
-import entity.Usuario;
+import com.example.demo.dto.UsuarioRequestDTO;
+import com.example.demo.dto.UsuarioResponseDTO;
+import com.example.demo.entity.Email;
+import com.example.demo.entity.Matricula;
+import com.example.demo.entity.Senha;
+import com.example.demo.entity.Usuario;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional; 
-import repository.UsuarioRepository;
+import com.example.demo.repository.UsuarioRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;

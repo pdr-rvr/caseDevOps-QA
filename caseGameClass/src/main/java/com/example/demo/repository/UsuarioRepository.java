@@ -1,8 +1,8 @@
-package repository;
+package com.example.demo.repository;
 
-import entity.Email;
-import entity.Matricula;
-import entity.Usuario;
+import com.example.demo.entity.Email;
+import com.example.demo.entity.Matricula;
+import com.example.demo.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;

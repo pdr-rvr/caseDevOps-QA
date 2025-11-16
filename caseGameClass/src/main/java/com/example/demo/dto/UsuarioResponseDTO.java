@@ -1,6 +1,6 @@
-package dto;
+package com.example.demo.dto;
 
-import entity.Usuario;
+import com.example.demo.entity.Usuario;
 import java.util.Objects;
 
 /**

@@ -1,4 +1,4 @@
-package entity;
+package com.example.demo.entity;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
