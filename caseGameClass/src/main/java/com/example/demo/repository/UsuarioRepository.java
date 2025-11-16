@@ -1,4 +1,4 @@
-package repository;
+package com.example.demo.repository;
 
 import entity.Email;
 import entity.Matricula;

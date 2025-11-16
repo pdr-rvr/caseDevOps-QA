@@ -1,4 +1,4 @@
-package dto;
+package com.example.demo.dto;
 
 import entity.Usuario;
 import java.util.Objects;

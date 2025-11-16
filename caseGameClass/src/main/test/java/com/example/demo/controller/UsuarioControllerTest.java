@@ -1,4 +1,4 @@
-package controller;
+package com.example.demo.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dto.UsuarioRequestDTO;
