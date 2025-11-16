@@ -31,4 +31,10 @@ public class Email {
     public int hashCode() {
         return Objects.hash(enderecoEmail);
     }
+
+    @Override
+    public String toString() {
+        return enderecoEmail;
+    }
+    
 }
