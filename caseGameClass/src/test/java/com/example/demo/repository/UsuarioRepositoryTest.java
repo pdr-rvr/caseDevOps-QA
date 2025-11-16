@@ -1,9 +1,9 @@
 package com.example.demo.repository;
 
-import entity.Email;
-import entity.Matricula;
-import entity.Senha;
-import entity.Usuario;
+import com.example.demo.entity.Email;
+import com.example.demo.entity.Matricula;
+import com.example.demo.entity.Senha;
+import com.example.demo.entity.Usuario;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
