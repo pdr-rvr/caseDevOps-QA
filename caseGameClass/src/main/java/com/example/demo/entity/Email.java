@@ -9,7 +9,7 @@ public class Email {
     protected Email() {}
 
     public Email(String enderecoEmail) {
-        if (enderecoEmail == null || !enderecoEmail.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+        if (enderecoEmail == null || !enderecoEmail.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
             throw new IllegalArgumentException("Email inválido");
         }
         this.enderecoEmail = enderecoEmail;
