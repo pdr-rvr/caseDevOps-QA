@@ -1,15 +1,24 @@
 package com.example.demo.entity;
 
+import jakarta.persistence.Embeddable;
+import java.io.Serializable;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
-public class Email {
+@Embeddable 
+public class Email implements Serializable {
 
     private String enderecoEmail;
 
-    protected Email() {}
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$"
+    );
+
+    protected Email() {
+    }
 
     public Email(String enderecoEmail) {
-        if (enderecoEmail == null || !enderecoEmail.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+        if (enderecoEmail == null || !EMAIL_PATTERN.matcher(enderecoEmail).matches()) {
             throw new IllegalArgumentException("Email inválido");
         }
         this.enderecoEmail = enderecoEmail;
@@ -19,7 +28,7 @@ public class Email {
         return enderecoEmail;
     }
 
-     @Override
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -36,5 +45,4 @@ public class Email {
     public String toString() {
         return enderecoEmail;
     }
-    
 }
