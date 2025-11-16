@@ -162,4 +162,35 @@ class UsuarioTest {
         assertFalse(usuario2.equals(usuario1));
         assertNotEquals(usuario1.hashCode(), usuario2.hashCode());
     }
+
+    @Test
+    @DisplayName("equals() deve retornar true para a mesma instância")
+    void equalsDeveRetornarTrueParaMesmaInstancia() {
+        // Dado
+        Usuario usuario = new Usuario(nomeValido, emailValido, matriculaValida, senhaValida);
+
+        // Quando & Então
+        assertTrue(usuario.equals(usuario));
+    }
+
+    @Test
+    @DisplayName("equals() deve retornar false para nulo")
+    void equalsDeveRetornarFalseParaNulo() {
+        // Dado
+        Usuario usuario = new Usuario(nomeValido, emailValido, matriculaValida, senhaValida);
+
+        // Quando & Então
+        assertFalse(usuario.equals(null));
+    }
+
+    @Test
+    @DisplayName("equals() deve retornar false para classe diferente")
+    void equalsDeveRetornarFalseParaClasseDiferente() {
+        // Dado
+        Usuario usuario = new Usuario(nomeValido, emailValido, matriculaValida, senhaValida);
+        Object objetoDiferente = new Object();
+
+        // Quando & Então
+        assertFalse(usuario.equals(objetoDiferente));
+    }
 }

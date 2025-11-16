@@ -3,22 +3,17 @@ package com.example.demo.entity;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 @Embeddable 
 public class Email implements Serializable {
 
     private String enderecoEmail;
 
-    private static final Pattern EMAIL_PATTERN = Pattern.compile(
-            "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$"
-    );
-
     protected Email() {
     }
 
     public Email(String enderecoEmail) {
-        if (enderecoEmail == null || !EMAIL_PATTERN.matcher(enderecoEmail).matches()) {
+        if (enderecoEmail == null || !enderecoEmail.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
             throw new IllegalArgumentException("Email inválido");
         }
         this.enderecoEmail = enderecoEmail;
