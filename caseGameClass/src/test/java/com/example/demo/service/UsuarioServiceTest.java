@@ -1,11 +1,11 @@
 package com.example.demo.service;
 
-import dto.UsuarioRequestDTO;
-import dto.UsuarioResponseDTO;
-import entity.Email;
-import entity.Matricula;
-import entity.Senha;
-import entity.Usuario;
+import com.example.demo.dto.UsuarioRequestDTO;
+import com.example.demo.dto.UsuarioResponseDTO;
+import com.example.demo.entity.Email;
+import com.example.demo.entity.Matricula;
+import com.example.demo.entity.Senha;
+import com.example.demo.entity.Usuario;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import repository.UsuarioRepository;
+import com.example.demo.repository.UsuarioRepository;
 
 import java.util.List;
 
