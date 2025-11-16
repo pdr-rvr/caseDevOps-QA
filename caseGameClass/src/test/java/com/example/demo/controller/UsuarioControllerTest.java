@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import com.example.demo.service.UsuarioService;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 
 import java.util.List;
 
@@ -25,7 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 // 1. Carrega apenas a camada Web (Controller) 
-@WebMvcTest(UsuarioController.class)
+@WebMvcTest(value = UsuarioController.class, 
+            excludeAutoConfiguration = {SecurityAutoConfiguration.class})
 class UsuarioControllerTest {
 
     // 2. Ferramenta para simular requisições HTTP
