@@ -139,6 +139,6 @@ class MatriculaTest {
         Matricula matricula = new Matricula(raValido);
 
         // Quando & Então
-        assertEquals(raValido, matricula.toString());
+        assertEquals("Matricula(ra=987654)", matricula.toString());
     }
 }

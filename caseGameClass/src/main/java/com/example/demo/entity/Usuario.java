@@ -12,6 +12,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -19,10 +23,13 @@ import java.util.Set;
 
 @Entity
 @Table(name = "tb_user")
+@Getter 
+@NoArgsConstructor(access = AccessLevel.PROTECTED) 
 public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter 
     private Long id;
 
     @Column(nullable = false)
@@ -46,10 +53,6 @@ public class Usuario {
                inverseJoinColumns = @JoinColumn(name = "curso_id"))
     private Set<Curso> cursosInscritos = new HashSet<>();
 
-    protected Usuario() {
-    }
-
-    // --- CONSTRUTOR ---
     public Usuario(String nome, Email email, Matricula matricula, Senha senha) {
         if (nome == null || nome.isBlank()) {
             throw new IllegalArgumentException("Nome não pode ser nulo ou vazio");
@@ -59,34 +62,6 @@ public class Usuario {
         this.matricula = matricula;
         this.senha = senha;
     }
-
-    // --- GETTERS ---
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public Email getEmail() {
-        return email;
-    }
-
-    public Matricula getMatricula() {
-        return matricula;
-    }
-
-    public Senha getSenha() {
-        return senha;
-    }
-
-    public Set<Curso> getCursosInscritos() {
-        return cursosInscritos;
-    }
-
-    // --- Métodos de Domínio ---
 
     public void alterarNome(String novoNome) {
         if (novoNome == null || novoNome.isBlank()) {
@@ -109,13 +84,7 @@ public class Usuario {
         this.cursosInscritos.remove(curso);
         curso.getAlunosInscritos().remove(this);
     }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
     
-    // --- Equals e HashCode ---
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -136,7 +105,7 @@ public class Usuario {
                 ", nome='" + nome + '\'' +
                 ", email=" + email.getEnderecoEmail() +
                 ", matricula=" + matricula.getRa() +
-                ", senha=***" +
+                ", senha=***" + // Segurança
                 '}';
     }
 }

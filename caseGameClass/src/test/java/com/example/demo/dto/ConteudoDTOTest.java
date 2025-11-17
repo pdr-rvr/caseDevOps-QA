@@ -39,12 +39,8 @@ class ConteudoDTOTest {
     @Test
     @DisplayName("Deve converter de Entidade para DTO")
     void deveConverterEntidadeParaDTO() {
-        // Cria a entidade e popula usando os setters que criamos anteriormente
-        Conteudo entity = new Conteudo();
-        entity.setNome("Nome da Entidade");
-        entity.setUrlVideo("http://entidade.com");
+        Conteudo entity = new Conteudo("Nome da Entidade", "http://entidade.com");
 
-        // Testa o construtor que aceita a Entidade
         ConteudoDTO dto = new ConteudoDTO(entity);
 
         assertNotNull(dto);

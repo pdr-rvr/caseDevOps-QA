@@ -98,7 +98,7 @@ class EmailTest {
         Email email = new Email(endereco);
 
         // Quando & Então
-        assertEquals(endereco, email.toString());
+        assertEquals("Email(enderecoEmail=log@teste.com)", email.toString());
     }
 
     @Test

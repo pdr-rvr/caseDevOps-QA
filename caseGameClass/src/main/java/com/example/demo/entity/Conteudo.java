@@ -2,10 +2,21 @@ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.validator.constraints.URL;
 
 @Entity
 @Table(name = "tb_conteudo")
+@Getter // Gera todos os Getters
+@Setter // Gera todos os Setters
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // Substitui o construtor public Conteudo() {}
+@EqualsAndHashCode(of = {"nome", "urlVideo"}) // Para entidades, é seguro usar o ID para igualdade
+@ToString(exclude = "curso") // Evita loop infinito no log
 public class Conteudo {
 
     @Id
@@ -26,32 +37,9 @@ public class Conteudo {
     @JoinColumn(name = "curso_id", nullable = false)
     private Curso curso;
     
-    // Construtor padrão
-    public Conteudo() {
-    }
-
-    // Construtor de entidade
     public Conteudo(String nome, String urlVideo) {
         this.nome = nome;
         this.urlVideo = urlVideo;
     }
 
-    // --- Getters e Setters ---
-    public Long getId() { return id; }
-    public String getNome() { return nome; }
-    public String getUrlVideo() { return urlVideo; }
-    public Curso getCurso() { return curso; }
-
-    // Setter especial para o relacionamento bidirecional
-    public void setCurso(Curso curso) {
-        this.curso = curso;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public void setUrlVideo(String urlVideo) {
-        this.urlVideo = urlVideo;
-    }
 }
