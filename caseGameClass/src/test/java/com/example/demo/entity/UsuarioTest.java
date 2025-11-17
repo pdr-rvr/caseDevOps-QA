@@ -134,6 +134,28 @@ class UsuarioTest {
         assertEquals(senhaValida, usuario.getSenha()); 
     }
 
+    @Test
+    @DisplayName("Deve manipular lista de cursos inscritos")
+    void deveManipularCursosInscritos() {
+        // Dado
+        Usuario usuario = new Usuario(nomeValido, emailValido, matriculaValida, senhaValida);
+        Curso curso = new Curso("Curso Java", "Desc");
+
+        // Quando
+        usuario.inscreverEmCurso(curso);
+
+        // Então
+        assertNotNull(usuario.getCursosInscritos());
+        assertTrue(usuario.getCursosInscritos().contains(curso));
+        assertTrue(curso.getAlunosInscritos().contains(usuario));
+
+        // Quando cancelar
+        usuario.cancelarInscricao(curso);
+        
+        // Então
+        assertFalse(usuario.getCursosInscritos().contains(curso));
+    }
+
     // --- 4. Testes de Contrato (Equals e HashCode) ---
 
     @Test

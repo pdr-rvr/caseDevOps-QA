@@ -110,6 +110,10 @@ public class Usuario {
         curso.getAlunosInscritos().remove(this);
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
     // --- Equals e HashCode ---
 
     @Override

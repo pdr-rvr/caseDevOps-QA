@@ -98,4 +98,30 @@ class CursoControllerTest {
         mockMvc.perform(delete("/api/cursos/1/cancelar/1"))
                 .andExpect(status().isNoContent());
     }
+
+    @Test
+    @DisplayName("Deve listar todos os cursos e retornar 200 OK")
+    void deveListarTodosCursos() throws Exception {
+        // Dado
+        when(cursoService.listarTodosCursos()).thenReturn(List.of(responseDTO));
+
+        // Quando & Então
+        mockMvc.perform(get("/api/cursos")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].nome").value("Curso de Spring"));
+    }
+
+    @Test
+    @DisplayName("Deve buscar curso por ID e retornar 200 OK")
+    void deveBuscarCursoPorId() throws Exception {
+        // Dado
+        when(cursoService.buscarCursoPorId(1L)).thenReturn(responseDTO);
+
+        // Quando & Então
+        mockMvc.perform(get("/api/cursos/1")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nome").value("Curso de Spring"));
+    }
 }

@@ -8,19 +8,26 @@ import static org.junit.jupiter.api.Assertions.*;
 class ConteudoTest {
 
     @Test
-    @DisplayName("Deve criar um conteúdo com dados válidos")
-    void deveCriarConteudo() {
-        // Dado
+    @DisplayName("Deve criar um conteúdo e associar a um curso")
+    void deveCriarConteudoEAssociarCurso() {
+
         String nome = "Aula de JPA";
         String url = "http://jpa.com";
+        Curso curso = new Curso("Curso Teste", "Desc");
 
-        // Quando
         Conteudo conteudo = new Conteudo(nome, url);
+        conteudo.setCurso(curso);
+        
+        Conteudo conteudoVazio = new Conteudo();
+        conteudoVazio.setUrlVideo("http://url.com");
+        conteudoVazio.setNome("Nome");
 
         // Então
         assertNotNull(conteudo);
         assertEquals(nome, conteudo.getNome());
         assertEquals(url, conteudo.getUrlVideo());
-        assertNull(conteudo.getCurso()); // Curso ainda não foi setado
+        assertEquals(curso, conteudo.getCurso()); 
+        
+        assertNotNull(conteudoVazio);
     }
 }

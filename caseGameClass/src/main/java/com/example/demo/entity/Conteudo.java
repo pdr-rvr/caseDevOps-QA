@@ -46,4 +46,12 @@ public class Conteudo {
     public void setCurso(Curso curso) {
         this.curso = curso;
     }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setUrlVideo(String urlVideo) {
+        this.urlVideo = urlVideo;
+    }
 }
