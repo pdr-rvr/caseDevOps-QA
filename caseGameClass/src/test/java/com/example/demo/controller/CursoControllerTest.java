@@ -16,8 +16,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 // Importações para desabilitar a segurança no teste
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.context.annotation.Import;
-import com.example.demo.config.SecurityConfig; // Importe sua classe SecurityConfig
 
 import java.util.List;
 
@@ -28,10 +26,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(value = CursoController.class,
-            // Exclui a segurança padrão, assim como fizemos no UsuarioControllerTest
+@WebMvcTest(controllers = CursoController.class, 
             excludeAutoConfiguration = {SecurityAutoConfiguration.class})
-@Import(SecurityConfig.class) // Importa sua configuração de segurança real (se necessário)
 class CursoControllerTest {
 
     @Autowired
