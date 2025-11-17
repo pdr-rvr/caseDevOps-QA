@@ -215,4 +215,22 @@ class UsuarioTest {
         // Quando & Então
         assertFalse(usuario.equals(objetoDiferente));
     }
+
+    @Test
+    @DisplayName("Deve testar Getters e Setters de ID")
+    void deveTestarGetSetId() {
+        Usuario usuario = new Usuario();
+        usuario.setId(100L);
+        
+        assertEquals(100L, usuario.getId());
+    }
+
+    @Test
+    @DisplayName("Deve testar Getter direto de Cursos Inscritos")
+    void deveTestarGetterCursosInscritos() {
+        Usuario usuario = new Usuario();
+        // Garante que a lista inicializa vazia e não nula
+        assertNotNull(usuario.getCursosInscritos());
+        assertTrue(usuario.getCursosInscritos().isEmpty());
+    }
 }

@@ -30,4 +30,11 @@ class ConteudoTest {
         
         assertNotNull(conteudoVazio);
     }
+
+    @Test
+    @DisplayName("Deve testar o retorno do ID")
+    void deveTestarGetId() {
+        Conteudo conteudo = new Conteudo();
+        assertNull(conteudo.getId());
+    }
 }
