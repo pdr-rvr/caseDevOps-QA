@@ -2,7 +2,7 @@ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.URL;
+import org.hibernate.validator.constraints.URL;
 
 @Entity
 @Table(name = "tb_conteudo")
@@ -11,7 +11,7 @@ public class Conteudo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    
     @NotBlank
     @Column(nullable = false)
     private String nome; // Ex: "Aula 1: Introdução"
