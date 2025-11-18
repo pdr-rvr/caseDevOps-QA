@@ -9,27 +9,27 @@ pipeline {
     }
 
     stage('Start container') {
-      steps {
-        dir('caseGameClass') {
-        echo 'Starting container from Docker Hub...'
-        bat 'docker-compose -f docker-compose.staging.yml down -v' 
-        bat 'docker-compose -f docker-compose.staging.yml pull'
-        bat 'docker-compose -f docker-compose.staging.yml up -d'
+            steps {
+                dir('caseGameClass') {
+                    echo 'Starting container from Docker Hub...'
+                    bat 'docker-compose -f docker-compose.staging.yml down -v'
+                    bat 'docker-compose -f docker-compose.staging.yml pull'
+                    bat 'docker-compose -f docker-compose.staging.yml up -d'
+                    echo 'Aguardando a aplicação iniciar...'
+                    sleep 90 
+                }
+            }
         }
-      }
-    }
 
-    stage('Run tests against the container') {
-      steps {
-        bat 'curl http://localhost:8686 || echo "Service not responding"'
-      }
-    }
-  }
+        stage('Run tests against the container') {
+            steps {
+                bat 'curl http://localhost:8686 || echo "Service not responding"'
+            }
+        }
 
   post {
     always {
       echo 'Pipeline completed'
-      // Não derruba mais o container aqui
     }
   }
 }
