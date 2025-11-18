@@ -2,13 +2,23 @@ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import java.util.HashSet;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "tb_curso")
+@Getter // Gera todos os Getters (getId, getNome, getConteudos, etc.)
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // Substitui o construtor public Curso() {}
+@EqualsAndHashCode(of = "nome") // Define a igualdade baseada na chave de negócio (nome único)
+@ToString(exclude = {"conteudos", "alunosInscritos"}) // Evita loops infinitos e LazyInitializationException
 public class Curso {
 
     @Id
@@ -23,35 +33,18 @@ public class Curso {
     @Column(nullable = false)
     private String descricao;
 
-    // Relacionamento: Um Curso tem muitos Conteúdos
-    // cascade = ALL: Se eu salvar um curso, salva os conteúdos. Se eu deletar, deleta os conteúdos.
-    // orphanRemoval = true: Se eu remover um conteúdo da lista, ele é deletado do banco.
     @OneToMany(mappedBy = "curso", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Conteudo> conteudos = new ArrayList<>();
 
-    // Relacionamento: Muitos Cursos podem ter muitos Usuários (alunos)
     @ManyToMany(mappedBy = "cursosInscritos", fetch = FetchType.LAZY)
     private Set<Usuario> alunosInscritos = new HashSet<>();
 
-    // Construtor padrão (exigido pelo JPA)
-    public Curso() {
-    }
-
-    // Construtor de entidade
     public Curso(String nome, String descricao) {
         this.nome = nome;
         this.descricao = descricao;
     }
 
-    // --- Getters e Setters ---
-    public Long getId() { return id; }
-    public String getNome() { return nome; }
-    public String getDescricao() { return descricao; }
-    public List<Conteudo> getConteudos() { return conteudos; }
-    public Set<Usuario> getAlunosInscritos() { return alunosInscritos; }
 
-    // --- Métodos Helper (Boas Práticas) ---
-    
     /**
      * Adiciona um conteúdo a este curso, mantendo a consistência
      * do relacionamento bidirecional.
