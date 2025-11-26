@@ -3,7 +3,6 @@ package com.example.demo.service;
 import com.example.demo.dto.ConteudoDTO;
 import com.example.demo.dto.CursoRequestDTO;
 import com.example.demo.dto.CursoResponseDTO;
-import com.example.demo.entity.Conteudo;
 import com.example.demo.entity.Curso;
 import com.example.demo.entity.Email;
 import com.example.demo.entity.Matricula;
@@ -19,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
