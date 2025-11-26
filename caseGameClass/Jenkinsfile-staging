@@ -35,7 +35,7 @@ pipeline {
                 sleep 30
                 
                 // Testa se a aplicação responde
-                bat 'curl -f http://localhost:8686 || echo "Aviso: Curl falhou, mas verifique os logs"'
+                bat 'curl -f http://localhost:8686/api/cursos || echo "Erro ao acessar API"'
             }
         }
     }
