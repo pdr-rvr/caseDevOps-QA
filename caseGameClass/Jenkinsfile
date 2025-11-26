@@ -81,7 +81,7 @@ pipeline {
             }
             steps {
                 // Usa as credenciais que já configuramos (docker-hub-push)
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-push', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                withCredentials([usernamePassword(credentialsId: '07bf5ea0-ccd0-4ed7-b5cc-dbd51fd31c4d', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     bat 'echo %PASS% | docker login --username %USER% --password-stdin'
                     
                     // Faz o push da versão específica
