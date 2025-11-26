@@ -233,4 +233,19 @@ class UsuarioTest {
         assertNotNull(usuario.getCursosInscritos());
         assertTrue(usuario.getCursosInscritos().isEmpty());
     }
+
+    @Test
+    @DisplayName("Deve testar o método toString para cobertura completa")
+    void deveTestarToString() {
+        // Dado
+        Usuario usuario = new Usuario(nomeValido, emailValido, matriculaValida, senhaValida);
+        
+        // Quando
+        String stringRepresentation = usuario.toString();
+        
+        // Então
+        assertNotNull(stringRepresentation);
+        // Opcional: Verifica se o toString contém dados relevantes
+        assertTrue(stringRepresentation.contains(nomeValido)); 
+    }
 }

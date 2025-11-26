@@ -2,20 +2,27 @@ version: '4'
 
 services:
   database:
-    image: postgres
+    image: postgres:13
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: sapi
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: my_database
+    ports:
+      - "5432:5432"
     volumes:
-      - db-volume:/var/lib/postgresql/data
+      - postgres_data_staging:/var/lib/postgresql/data 
 
   api:
     image: rvrpdr/casedevops-qa:latest
-    networks:
-      - default  # Certifique-se de que está usando a rede adequada
-    environment:
-      DB_HOST: database
     ports:
       - "8686:8080"
+    depends_on:
+      - database
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/my_database
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
 volumes:
-  db-volume:
+  postgres_data_staging:
