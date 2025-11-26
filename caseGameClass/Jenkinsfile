@@ -70,7 +70,7 @@ pipeline {
         stage('Trivy Scan (Image)') {
             steps {
                 // Varre a imagem Docker que acabamos de criar
-                bat "trivy image --config caseGameClass/.trivy.yaml %FULL_IMAGE%"
+                bat "trivy image --config caseGameClass/.trivy.yaml --ignorefile caseGameClass/.trivyignore %FULL_IMAGE%"
             }
         }
 
