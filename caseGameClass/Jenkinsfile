@@ -1,0 +1,110 @@
+pipeline {
+    agent any
+
+    environment {
+        // Define o nome da imagem
+        REGISTRY = 'docker.io' 
+        DOCKER_USER = 'rvrpdr'
+        IMAGE_NAME = 'casedevops-qa'
+        // Cria uma tag única baseada no número do build
+        IMAGE_TAG = "build-${env.BUILD_NUMBER}"
+        FULL_IMAGE = "${DOCKER_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
+        LATEST_IMAGE = "${DOCKER_USER}/${IMAGE_NAME}:latest"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build & Test (Maven)') {
+            steps {
+                dir('caseGameClass') {
+                    // Compila e roda os testes unitários
+                    bat 'mvn clean install'
+                }
+            }
+        }
+
+        stage('Quality Gate (JaCoCo & PMD)') {
+            steps {
+                dir('caseGameClass') {
+                    // Publica os relatórios (O build falha se os testes falharem no passo anterior)
+                    recordIssues(
+                        tools: [pmdParser(pattern: '**/target/pmd.xml')]
+                    )
+                    junit '**/target/surefire-reports/*.xml'
+                    // Verifica cobertura (ajuste o threshold conforme necessário)
+                    jacoco(
+                        execPattern: '**/target/jacoco.exec',
+                        classPattern: '**/target/classes',
+                        sourcePattern: 'src/main/java',
+                        changeBuildStatus: true,
+                        minimumLineCoverage: '70' 
+                    )
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('caseGameClass') {
+                    // Constrói a imagem localmente, mas NÃO faz push ainda
+                    bat "docker build -t %FULL_IMAGE% ."
+                }
+            }
+        }
+
+        stage('Trivy Scan (FileSystem)') {
+            steps {
+                dir('caseGameClass') {
+                    // Varre o código fonte em busca de senhas ou dependências inseguras
+                    // exit-code 1: falha o pipeline se achar erro CRITICO/HIGH
+                    bat "trivy fs --config .trivy.yaml ."
+                }
+            }
+        }
+
+        stage('Trivy Scan (Image)') {
+            steps {
+                // Varre a imagem Docker que acabamos de criar
+                bat "trivy image --config caseGameClass/.trivy.yaml %FULL_IMAGE%"
+            }
+        }
+
+        stage('Docker Login & Push') {
+            // Só roda se os scans de segurança passarem
+            when {
+                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
+            }
+            steps {
+                // Usa as credenciais que já configuramos (docker-hub-push)
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-push', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    bat 'echo %PASS% | docker login --username %USER% --password-stdin'
+                    
+                    // Faz o push da versão específica
+                    bat "docker push %FULL_IMAGE%"
+                    
+                    // Taggeia como latest e faz push
+                    bat "docker tag %FULL_IMAGE% %LATEST_IMAGE%"
+                    bat "docker push %LATEST_IMAGE%"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Limpa imagens locais para economizar espaço
+            bat "docker rmi %FULL_IMAGE% || exit 0"
+            bat "docker rmi %LATEST_IMAGE% || exit 0"
+            echo 'Pipeline DevSecOps finalizado.'
+        }
+        success {
+            // Se tudo deu certo, aciona o Staging
+            build job: 'pipeline_staging', wait: false
+        }
+    }
+}
