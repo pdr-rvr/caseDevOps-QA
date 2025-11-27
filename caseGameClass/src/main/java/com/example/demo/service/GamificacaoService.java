@@ -42,7 +42,7 @@ public class GamificacaoService {
     @Transactional
     public ResultadoResponseDTO registrarSolucaoAvaliacao(Long avaliacaoId, SolucaoAvaliacaoDTO solucaoDTO) {
         // 1. Validar Contexto (Temporada, Aluno, Avaliação)
-        Temporada temporadaAtual = temporadaService.buscarTemporadaAtiva();
+        Temporada temporadaAtual = temporadaService.buscarEntidadeTemporadaAtiva();
 
         Usuario aluno = usuarioRepository.findById(solucaoDTO.getAlunoId())
                 .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado."));
@@ -69,7 +69,7 @@ public class GamificacaoService {
      */
     @Transactional(readOnly = true)
     public List<ItemPlacarDTO> gerarPlacarAtual() {
-        Temporada temporadaAtual = temporadaService.buscarTemporadaAtiva();
+        Temporada temporadaAtual = temporadaService.buscarEntidadeTemporadaAtiva();
 
         List<Classificacao> ranking = classificacaoRepository
                 .findByTemporadaOrderByPontuacaoTotalDescUltimaAtualizacaoAsc(temporadaAtual);

@@ -38,9 +38,8 @@ public class TemporadaController {
      */
     @GetMapping("/ativa")
     public ResponseEntity<TemporadaResponseDTO> buscarTemporadaAtiva() {
-        // O service retorna a Entidade, aqui é feita uma conversão rápida para DTO
-        Temporada temporada = temporadaService.buscarTemporadaAtiva();
-        return ResponseEntity.ok(new TemporadaResponseDTO(temporada));
+        TemporadaResponseDTO response = temporadaService.buscarTemporadaAtiva();
+        return ResponseEntity.ok(response);
     }
 
     /**

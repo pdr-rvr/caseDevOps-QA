@@ -41,25 +41,20 @@ class AvaliacaoServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        // Setup Dados Básicos
         curso = new Curso("Curso Java", "Descrição");
-        
-        // Monta o DTO de Request Completo
         requestDTO = new AvaliacaoRequestDTO();
         requestDTO.setTitulo("Prova 1");
         requestDTO.setCursoId(1L);
 
-        // Cria 1 questão válida para o DTO
         QuestaoRequestDTO questaoDTO = new QuestaoRequestDTO();
         questaoDTO.setEnunciado("Pergunta?");
         questaoDTO.setPontos(10);
         
-        // Cria 5 opções para o DTO (1 certa, 4 erradas)
         List<OpcaoRequestDTO> opcoesDTO = new ArrayList<>();
         for(int i=0; i<5; i++) {
             OpcaoRequestDTO op = new OpcaoRequestDTO();
             op.setTexto("Texto " + i);
-            op.setCorreta(i == 0); // A primeira é correta
+            op.setCorreta(i == 0);
             opcoesDTO.add(op);
         }
         questaoDTO.setOpcoes(opcoesDTO);
@@ -67,17 +62,16 @@ class AvaliacaoServiceTest {
         requestDTO.setQuestoes(List.of(questaoDTO));
     }
 
+    // --- Testes de Criar ---
+
     @Test
     @DisplayName("Deve criar avaliação com sucesso")
     void deveCriarAvaliacao() {
-        // Dado
         when(cursoRepository.findById(1L)).thenReturn(Optional.of(curso));
         when(avaliacaoRepository.save(any(Avaliacao.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        // Quando
         AvaliacaoResponseDTO response = avaliacaoService.criarAvaliacao(requestDTO);
 
-        // Então
         assertNotNull(response);
         assertEquals("Prova 1", response.getTitulo());
         assertEquals(1, response.getQuestoes().size());
@@ -87,11 +81,9 @@ class AvaliacaoServiceTest {
     @Test
     @DisplayName("Não deve criar avaliação se curso não existe")
     void naoDeveCriarSeCursoNaoExiste() {
-        // Dado
         when(cursoRepository.findById(99L)).thenReturn(Optional.empty());
         requestDTO.setCursoId(99L);
 
-        // Quando & Então
         assertThrows(IllegalArgumentException.class, () -> {
             avaliacaoService.criarAvaliacao(requestDTO);
         });
@@ -99,17 +91,52 @@ class AvaliacaoServiceTest {
         verify(avaliacaoRepository, never()).save(any());
     }
     
+    // --- Testes de Listar ---
+
     @Test
     @DisplayName("Deve listar avaliações por curso")
     void deveListarAvaliacoes() {
-        // Dado
         when(cursoRepository.existsById(1L)).thenReturn(true);
         when(avaliacaoRepository.findByCursoId(1L)).thenReturn(List.of(new Avaliacao("Prova 1", curso)));
 
-        // Quando
         List<AvaliacaoResponseDTO> lista = avaliacaoService.listarAvaliacoesPorCurso(1L);
 
-        // Então
         assertEquals(1, lista.size());
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro ao listar se curso não existe")
+    void deveLancarErroAoListarSeCursoNaoExiste() {
+        when(cursoRepository.existsById(99L)).thenReturn(false);
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+            avaliacaoService.listarAvaliacoesPorCurso(99L);
+        });
+        assertEquals("Curso não encontrado com ID: 99", ex.getMessage());
+    }
+
+    // --- Testes de Buscar por ID ---
+
+    @Test
+    @DisplayName("Deve buscar avaliação por ID com sucesso")
+    void deveBuscarAvaliacaoPorId() {
+        Avaliacao avaliacao = new Avaliacao("Prova Final", curso);
+        when(avaliacaoRepository.findById(1L)).thenReturn(Optional.of(avaliacao));
+
+        AvaliacaoResponseDTO response = avaliacaoService.buscarAvaliacaoPorId(1L);
+
+        assertNotNull(response);
+        assertEquals("Prova Final", response.getTitulo());
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro ao buscar avaliação inexistente")
+    void deveLancarErroAoBuscarInexistente() {
+        when(avaliacaoRepository.findById(99L)).thenReturn(Optional.empty());
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+            avaliacaoService.buscarAvaliacaoPorId(99L);
+        });
+        assertEquals("Avaliação não encontrada com ID: 99", ex.getMessage());
     }
 }
