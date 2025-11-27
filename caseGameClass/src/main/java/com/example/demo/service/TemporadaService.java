@@ -41,12 +41,18 @@ public class TemporadaService {
         return new TemporadaResponseDTO(temporada);
     }
 
+
+    @Transactional(readOnly = true)
+    public TemporadaResponseDTO buscarTemporadaAtiva() {
+        return new TemporadaResponseDTO(buscarEntidadeTemporadaAtiva());
+    }
+
     /**
-     * Busca a temporada que está valendo AGORA.
-     * Se não houver nenhuma ativa, lança erro, pois o jogo não pode acontecer sem temporada.
+     * Retorna a ENTIDADE para uso interno de outros serviços (GamificacaoService).
+     * Este método contém a lógica real de busca.
      */
     @Transactional(readOnly = true)
-    public Temporada buscarTemporadaAtiva() {
+    public Temporada buscarEntidadeTemporadaAtiva() {
         Optional<Temporada> ativaOpt = temporadaRepository.findByAtivaTrue();
 
         if (ativaOpt.isPresent()) {
@@ -56,7 +62,6 @@ public class TemporadaService {
                 return ativa;
             }
         }
-
         throw new IllegalStateException("Não há nenhuma temporada ativa ou vigente no momento. O placar está fechado.");
     }
 

@@ -6,89 +6,131 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 class QuestaoTest {
 
-    // --- Helper para criar lista de opções ---
+    // --- Helper ---
     private List<Opcao> criarOpcoes(int quantidade, int corretas) {
         List<Opcao> opcoes = new ArrayList<>();
         for (int i = 0; i < quantidade; i++) {
-            // Se ainda precisamos gerar opções corretas, marca como true
             boolean ehCorreta = i < corretas;
             opcoes.add(new Opcao("Opção " + i, ehCorreta));
         }
         return opcoes;
     }
 
-    // --- Testes de Sucesso ---
-
+    // --- 1. Testes de Sucesso ---
     @Test
-    @DisplayName("Deve criar Questão válida (5 opções, 1 correta)")
+    @DisplayName("Deve criar Questão válida")
     void deveCriarQuestaoValida() {
         List<Opcao> opcoesValidas = criarOpcoes(5, 1);
-
-        assertDoesNotThrow(() -> {
-            new Questao("Enunciado Válido", 10, opcoesValidas);
-        });
+        Questao q = new Questao("Enunciado Válido", 10, opcoesValidas);
+        
+        assertNotNull(q);
+        assertEquals("Enunciado Válido", q.getEnunciado());
+        assertEquals(10, q.getPontos());
+        assertEquals(5, q.getOpcoes().size());
+        
+        // Cobertura do setter de Avaliacao
+        Avaliacao av = mock(Avaliacao.class);
+        q.setAvaliacao(av);
+        assertEquals(av, q.getAvaliacao());
+        // Cobertura do getter de ID (null antes de persistir)
+        assertNull(q.getId());
     }
 
-    // --- Testes de Falha (Quantidade de Opções) ---
-
+    // --- 2. Cobertura de Validações Básicas (Null/Empty) ---
+    
     @Test
-    @DisplayName("Não deve criar Questão com 4 opções")
-    void naoDeveCriarComMenosDeCincoOpcoes() {
-        List<Opcao> opcoes = criarOpcoes(4, 1); // 4 opções, 1 correta
-
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
-            new Questao("Enunciado", 10, opcoes);
-        });
-        assertEquals("Uma questão deve conter exatamente 5 opções.", ex.getMessage());
-    }
-
-    @Test
-    @DisplayName("Não deve criar Questão com 6 opções")
-    void naoDeveCriarComMaisDeCincoOpcoes() {
-        List<Opcao> opcoes = criarOpcoes(6, 1); // 6 opções
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            new Questao("Enunciado", 10, opcoes);
-        });
-    }
-
-    // --- Testes de Falha (Regra da Opção Correta) ---
-
-    @Test
-    @DisplayName("Não deve criar Questão com 0 opções corretas")
-    void naoDeveCriarSemOpcaoCorreta() {
-        List<Opcao> opcoes = criarOpcoes(5, 0); // 5 opções, TODAS falsas
-
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
-            new Questao("Enunciado", 10, opcoes);
-        });
-        assertEquals("A questão deve ter exatamente 1 opção correta e 4 erradas.", ex.getMessage());
-    }
-
-    @Test
-    @DisplayName("Não deve criar Questão com 2 opções corretas")
-    void naoDeveCriarComDuasOpcoesCorretas() {
-        List<Opcao> opcoes = criarOpcoes(5, 2); // 5 opções, 2 verdadeiras
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            new Questao("Enunciado", 10, opcoes);
-        });
-    }
-
-    // --- Testes de Validação Básica ---
-
-    @Test
-    @DisplayName("Não deve criar Questão com enunciado vazio")
-    void naoDeveCriarSemEnunciado() {
+    @DisplayName("Deve falhar com parâmetros nulos")
+    void deveFalharComParametrosNulos() {
         List<Opcao> opcoes = criarOpcoes(5, 1);
-        assertThrows(IllegalArgumentException.class, () -> {
-            new Questao("", 10, opcoes);
-        });
+
+        // Enunciado Nulo
+        Exception ex1 = assertThrows(IllegalArgumentException.class, () -> 
+            new Questao(null, 10, opcoes));
+        assertEquals("O enunciado da questão é obrigatório.", ex1.getMessage());
+
+        // Pontos Nulo
+        Exception ex2 = assertThrows(IllegalArgumentException.class, () -> 
+            new Questao("E", null, opcoes));
+        assertEquals("A pontuação deve ser maior que zero.", ex2.getMessage());
+
+        // Opções Nulo
+        Exception ex3 = assertThrows(IllegalArgumentException.class, () -> 
+            new Questao("E", 10, null));
+        assertEquals("Uma questão deve conter exatamente 5 opções.", ex3.getMessage());
+    }
+
+    @Test
+    @DisplayName("Deve falhar com enunciado vazio/branco")
+    void deveFalharComEnunciadoVazio() {
+        List<Opcao> opcoes = criarOpcoes(5, 1);
+        assertThrows(IllegalArgumentException.class, () -> new Questao("", 10, opcoes));
+        assertThrows(IllegalArgumentException.class, () -> new Questao("   ", 10, opcoes));
+    }
+
+    @Test
+    @DisplayName("Deve falhar com pontuação zero ou negativa")
+    void deveFalharComPontuacaoInvalida() {
+        List<Opcao> opcoes = criarOpcoes(5, 1);
+        
+        // Zero
+        assertThrows(IllegalArgumentException.class, () -> new Questao("E", 0, opcoes));
+        
+        // Negativo
+        assertThrows(IllegalArgumentException.class, () -> new Questao("E", -5, opcoes));
+    }
+
+    // --- 3. Cobertura da Regra de Negócio (Quantidade Opções) ---
+
+    @Test
+    @DisplayName("Não deve criar com != 5 opções")
+    void validaQuantidadeOpcoes() {
+        // Menos
+        assertThrows(IllegalArgumentException.class, () -> 
+            new Questao("E", 10, criarOpcoes(4, 1)));
+            
+        // Mais
+        assertThrows(IllegalArgumentException.class, () -> 
+            new Questao("E", 10, criarOpcoes(6, 1)));
+    }
+
+    @Test
+    @DisplayName("Deve validar quantidade de corretas")
+    void validaQuantidadeCorretas() {
+        // Nenhuma correta
+        Exception ex1 = assertThrows(IllegalArgumentException.class, () -> 
+            new Questao("E", 10, criarOpcoes(5, 0)));
+        assertEquals("A questão deve ter exatamente 1 opção correta e 4 erradas.", ex1.getMessage());
+
+        // Duas corretas
+        assertThrows(IllegalArgumentException.class, () -> 
+            new Questao("E", 10, criarOpcoes(5, 2)));
+    }
+
+    // --- 4. Cobertura de Métodos Gerados (Lombok) ---
+    
+    @Test
+    @DisplayName("Deve cobrir Equals, HashCode e ToString")
+    void testeMetodosLombok() {
+        List<Opcao> op = criarOpcoes(5, 1);
+        Questao q1 = new Questao("Teste", 10, op);
+        Questao q2 = new Questao("Teste", 10, op); // Igual a q1 (mesmo enunciado)
+        Questao q3 = new Questao("Outro", 10, op); // Diferente
+
+        // Equals
+        assertTrue(q1.equals(q2));
+        assertFalse(q1.equals(q3));
+        assertFalse(q1.equals(null));
+        assertFalse(q1.equals(new Object()));
+        
+        // HashCode
+        assertEquals(q1.hashCode(), q2.hashCode());
+        
+        // ToString
+        assertNotNull(q1.toString());
     }
 }
