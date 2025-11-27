@@ -2,36 +2,41 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('Deploy to Staging') {
             steps {
-                checkout scm
+                echo '=== Iniciando Deploy em Staging ==='
+                
+                // 1. Limpeza: Para e remove o container antigo se existir
+                bat 'docker stop staging-app 2>nul || exit 0'
+                bat 'docker rm staging-app 2>nul || exit 0'
+                
+                // 2. Atualização: Baixa a imagem mais recente (que passou no Trivy)
+                bat 'docker pull rvrpdr/casedevops-qa:latest'
+                
+                // 3. Execução: Roda o container com H2 em memória
+                // Mapeia porta 8686 do host para 8080 do container
+                bat '''
+                docker run -d --name staging-app -p 8686:8080 ^
+                -e SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb ^
+                -e SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver ^
+                -e SPRING_DATASOURCE_USERNAME=sa ^
+                -e SPRING_DATASOURCE_PASSWORD=password ^
+                -e SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.H2Dialect ^
+                -e SPRING_JPA_HIBERNATE_DDL_AUTO=update ^
+                rvrpdr/casedevops-qa:latest
+                '''
             }
         }
 
-        stage('Start container') {
+        stage('Health Check') {
             steps {
-                dir('caseGameClass') {
-                    echo 'Starting container from Docker Hub...'
-                    bat 'docker-compose -f docker-compose.staging.yml down -v'
-                    bat 'docker-compose -f docker-compose.staging.yml pull'
-                    bat 'docker-compose -f docker-compose.staging.yml up -d'
-                    
-                    echo 'Aguardando a aplicação iniciar...'
-                    sleep 90 
-                }
+                echo '=== Verificando Saúde da Aplicação ==='
+                // Espera um pouco para o Spring Boot subir
+                sleep 30
+                
+                // Testa se a aplicação responde
+                bat 'curl -f http://localhost:8686/api/cursos || echo "Erro ao acessar API"'
             }
-        }
-
-        stage('Run tests against the container') {
-            steps {
-                bat 'curl http://localhost:8686 || echo "Service not responding"'
-            }
-        }
-    }
-
-    post {
-        always {
-            echo 'Pipeline completed'
         }
     }
 }
