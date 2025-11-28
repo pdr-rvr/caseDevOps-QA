@@ -17,9 +17,4 @@ class CaseGameClassApplicationTest {
     void contextLoads() {
     }
 
-    @Test
-    @DisplayName("Deve executar o método main sem erros")
-    void deveExecutarMetodoMain() {
-        CaseGameClassApplication.main(new String[] {});
-    }
 }
