@@ -1,20 +1,23 @@
 pipeline {
     agent any
 
-    stages {
-        stage('Deploy to Staging') {
+    stage('Deploy to Staging') {
             steps {
                 echo '=== Iniciando Deploy em Staging com RabbitMQ ==='
                 
-                // Entra na pasta onde está o docker-compose.staging.yml
                 dir('caseGameClass') {
-                    // 1. Limpeza: Derruba containers e redes antigas
+
+                    // 1. Limpeza "bruta": Garante que containers antigos morram
+                    bat 'docker stop staging-app 2>nul || exit 0'
+                    bat 'docker rm staging-app 2>nul || exit 0'
+                    bat 'docker stop staging-rabbitmq 2>nul || exit 0'
+                    bat 'docker rm staging-rabbitmq 2>nul || exit 0'
+
+                    // 2. Limpeza do Compose (para redes e volumes)
                     bat 'docker-compose -f docker-compose.staging.yml down -v'
                     
-                    // 2. Atualização: Baixa a imagem mais recente da API e do RabbitMQ
+                    // 3. Atualização e Execução
                     bat 'docker-compose -f docker-compose.staging.yml pull'
-                    
-                    // 3. Execução: Sobe tudo (API + RabbitMQ) em background
                     bat 'docker-compose -f docker-compose.staging.yml up -d'
                     
                     echo 'Aguardando os serviços iniciarem...'
