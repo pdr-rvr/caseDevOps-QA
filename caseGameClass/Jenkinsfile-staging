@@ -1,12 +1,13 @@
 pipeline {
     agent any
 
-    stage('Deploy to Staging') {
+    stages {
+        
+        stage('Deploy to Staging') {
             steps {
                 echo '=== Iniciando Deploy em Staging com RabbitMQ ==='
                 
                 dir('caseGameClass') {
-
                     // 1. Limpeza "bruta": Garante que containers antigos morram
                     bat 'docker stop staging-app 2>nul || exit 0'
                     bat 'docker rm staging-app 2>nul || exit 0'
