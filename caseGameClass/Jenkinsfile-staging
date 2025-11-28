@@ -4,38 +4,30 @@ pipeline {
     stages {
         stage('Deploy to Staging') {
             steps {
-                echo '=== Iniciando Deploy em Staging ==='
+                echo '=== Iniciando Deploy em Staging com RabbitMQ ==='
                 
-                // 1. Limpeza: Para e remove o container antigo se existir
-                bat 'docker stop staging-app 2>nul || exit 0'
-                bat 'docker rm staging-app 2>nul || exit 0'
-                
-                // 2. Atualização: Baixa a imagem mais recente (que passou no Trivy)
-                bat 'docker pull rvrpdr/casedevops-qa:latest'
-                
-                // 3. Execução: Roda o container com H2 em memória
-                // Mapeia porta 8686 do host para 8080 do container
-                bat '''
-                docker run -d --name staging-app -p 8686:8080 ^
-                -e SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb ^
-                -e SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver ^
-                -e SPRING_DATASOURCE_USERNAME=sa ^
-                -e SPRING_DATASOURCE_PASSWORD=password ^
-                -e SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.H2Dialect ^
-                -e SPRING_JPA_HIBERNATE_DDL_AUTO=update ^
-                rvrpdr/casedevops-qa:latest
-                '''
+                // Entra na pasta onde está o docker-compose.staging.yml
+                dir('caseGameClass') {
+                    // 1. Limpeza: Derruba containers e redes antigas
+                    bat 'docker-compose -f docker-compose.staging.yml down -v'
+                    
+                    // 2. Atualização: Baixa a imagem mais recente da API e do RabbitMQ
+                    bat 'docker-compose -f docker-compose.staging.yml pull'
+                    
+                    // 3. Execução: Sobe tudo (API + RabbitMQ) em background
+                    bat 'docker-compose -f docker-compose.staging.yml up -d'
+                    
+                    echo 'Aguardando os serviços iniciarem...'
+                    sleep 60 
+                }
             }
         }
 
         stage('Health Check') {
             steps {
                 echo '=== Verificando Saúde da Aplicação ==='
-                // Espera um pouco para o Spring Boot subir
-                sleep 30
-                
-                // Testa se a aplicação responde
-                bat 'curl -f http://localhost:8686/api/cursos || echo "Erro ao acessar API"'
+                // Testa se a API respondeu e conectou (Swagger UI)
+                bat 'curl -f http://localhost:8686/swagger-ui/index.html || echo "Erro: Swagger inacesível"'
             }
         }
     }
