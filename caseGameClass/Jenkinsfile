@@ -99,7 +99,6 @@ pipeline {
         always {
             // Limpa imagens locais para economizar espaço
             bat "docker rmi %FULL_IMAGE% || exit 0"
-            bat "docker rmi %LATEST_IMAGE% || exit 0"
             echo 'Pipeline DevSecOps finalizado.'
         }
         success {
