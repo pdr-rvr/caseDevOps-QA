@@ -11,6 +11,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import com.example.demo.config.RabbitMQConfig;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +25,9 @@ public class CursoService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     // Método para buscar todos os cursos
     public List<CursoResponseDTO> listarTodosCursos() {
@@ -76,6 +81,9 @@ public class CursoService {
         
         // Salvamos o "dono" do relacionamento (Usuario)
         usuarioRepository.save(usuario);
+
+        String mensagem = "Nova inscrição: Usuário " + usuario.getNome() + " no curso " + curso.getNome();
+        rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_INSCRICOES, mensagem);
     }
 
     // Método para cancelar inscrição
