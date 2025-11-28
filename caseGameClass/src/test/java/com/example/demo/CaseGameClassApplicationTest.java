@@ -8,7 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 @SpringBootTest
 class CaseGameClassApplicationTest {
-
+    
     @MockBean
     private ConnectionFactory connectionFactory;
 
