@@ -1,28 +1,41 @@
-version: '4'
+version: '3.8'
 
 services:
-  database:
-    image: postgres:13
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: my_database
+
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: staging-rabbitmq
     ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data_staging:/var/lib/postgresql/data 
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   api:
     image: rvrpdr/casedevops-qa:latest
+    container_name: staging-app
     ports:
       - "8686:8080"
     depends_on:
-      - database
+      rabbitmq:
+        condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/my_database
-      SPRING_DATASOURCE_USERNAME: user
+      # Configurações do Banco H2 
+      SPRING_DATASOURCE_URL: jdbc:h2:mem:testdb
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.h2.Driver
+      SPRING_DATASOURCE_USERNAME: sa
       SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.H2Dialect
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-
-volumes:
-  postgres_data_staging:
+      
+      # Configurações do RabbitMQ 
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: password
